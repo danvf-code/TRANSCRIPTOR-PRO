@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Transcriptor Pro</title>
+<script>try{var t=localStorage.getItem('theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Schibsted+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f4fa;--panel:#fff;--panel2:#f5f7fc;--ink:#121a33;--mute:#5d6987;--line:#dde2ef;--accent:#4a55e8;--accent-d:#3a44c4;--on-accent:#fff;--mark:#fff1b8;--mark-line:#e0a800;--hit:#cfd5ff;--glow:rgba(74,85,232,.15);--err:#b3261e;
+--shadow:0 1px 2px rgba(18,26,51,.05),0 10px 28px rgba(18,26,51,.06);--r-lg:22px;--r-md:14px;--r-sm:10px;color-scheme:light}
+[data-theme=dark]{--bg:#0c111f;--panel:#141b2e;--panel2:#1a2338;--ink:#e9edf9;--mute:#97a3c4;--line:#27314d;--accent:#8e98ff;--accent-d:#adb4ff;--on-accent:#0c111f;--mark:rgba(255,214,102,.13);--mark-line:#ffd666;--hit:rgba(142,152,255,.35);--glow:rgba(142,152,255,.18);--err:#ff8a80;
+--shadow:0 1px 2px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.35);color-scheme:dark}
+*{box-sizing:border-box;margin:0}
+body{font:16px/1.55 'Schibsted Grotesk',system-ui,sans-serif;background:radial-gradient(900px 420px at 12% -8%,var(--glow),transparent) fixed,var(--bg);color:var(--ink);min-height:100vh;transition:background-color .2s,color .2s}
+h1,h2,strong,.display{font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.02em}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+header{display:flex;align-items:center;gap:14px;padding:22px clamp(16px,4vw,48px)}
+.logo{width:42px;height:42px;border-radius:12px;background:var(--accent);display:grid;place-items:center;flex:none}
+.logo svg{stroke:var(--on-accent)}
+header h1{font-size:1.4rem;font-weight:800;line-height:1.1}
+header p{color:var(--mute);font-size:.9rem}
+#theme{margin-left:auto;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--panel);cursor:pointer;display:grid;place-items:center;box-shadow:var(--shadow)}
+#theme:hover{border-color:var(--accent)}
+#theme svg{stroke:var(--ink)}
+#theme .sun{display:none}
+[data-theme=dark] #theme .sun{display:block}
+[data-theme=dark] #theme .moon{display:none}
+main{display:grid;grid-template-columns:minmax(300px,390px) 1fr;gap:24px;padding:0 clamp(16px,4vw,48px) 48px;align-items:start}
+@media(max-width:860px){main{grid-template-columns:1fr}header p{display:none}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);padding:22px;box-shadow:var(--shadow)}
+.side{position:sticky;top:16px;display:grid;gap:16px}
+@media(max-width:860px){.side{position:static}}
+.drop{border:2px dashed var(--line);background:var(--panel2);border-radius:var(--r-md);padding:30px 16px;text-align:center;cursor:pointer;transition:.15s;display:block}
+.drop:hover,.drop.over{border-color:var(--accent);background:var(--glow)}
+.drop strong{display:block;font-size:1.2rem}
+.drop small{color:var(--mute)}
+.drop svg{margin-bottom:10px;stroke:var(--accent)}
+#file{display:none}
+.fname{margin-top:12px;font-weight:600;word-break:break-all;font-size:.95rem}
+video,audio{width:100%;margin-top:12px;border-radius:var(--r-md);background:#000;max-height:220px}
+audio{background:none}
+label.f{display:block;font-weight:600;font-size:.9rem;margin:16px 0 6px}
+select,input[type=search]{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--panel2)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:var(--r-sm);padding:11px 16px;font-weight:600;cursor:pointer;transition:.15s;text-decoration:none}
+.primary{width:100%;margin-top:20px;background:var(--accent);color:var(--on-accent);padding:14px;font-size:1.02rem}
+.primary:hover:not(:disabled){background:var(--accent-d)}
+.primary:disabled{opacity:.4;cursor:not-allowed}
+.ghost{background:var(--panel2);border:1px solid var(--line);color:var(--ink);padding:9px 13px;font-size:.88rem}
+.ghost:hover:not(.off){border-color:var(--accent);color:var(--accent)}
+.ghost.off{opacity:.4;pointer-events:none}
+.status{display:none}.status.on{display:block}
+.bar{height:10px;border-radius:99px;background:var(--panel2);border:1px solid var(--line);overflow:hidden;margin:10px 0 6px}
+.bar i{display:block;height:100%;width:0;background:repeating-linear-gradient(90deg,var(--accent) 0 4px,transparent 4px 6px);transition:width .4s}
+.stage{display:flex;justify-content:space-between;font-size:.9rem;color:var(--mute)}.stage b{color:var(--ink)}
+.err{color:var(--err);font-weight:600;margin-top:10px;display:none}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+.tools input[type=search]{flex:1;min-width:170px;width:auto}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.chip{background:var(--panel2);border:1px solid var(--line);border-radius:99px;padding:3px 12px;font-size:.85rem;color:var(--mute)}
+.chip b{color:var(--ink)}
+.empty{padding:70px 16px;text-align:center;color:var(--mute)}
+.empty h2{color:var(--ink);font-size:1.5rem;margin-bottom:6px}
+#list{display:grid;gap:2px}
+.seg{display:grid;grid-template-columns:96px 1fr;gap:14px;padding:12px 12px;border-radius:var(--r-sm);cursor:pointer;box-shadow:inset 3px 0 0 transparent;transition:background .15s}
+.seg:hover{background:var(--panel2)}
+.seg.on{background:var(--mark);box-shadow:inset 3px 0 0 var(--mark-line)}
+.seg time{align-self:start;text-align:center;font-family:'Bricolage Grotesque';font-weight:700;font-variant-numeric:tabular-nums;color:var(--accent);background:var(--panel2);border:1px solid var(--line);border-radius:99px;padding:2px 0;font-size:.95rem}
+.seg.on time{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.seg p{max-width:70ch}
+.seg.hide{display:none}
+mark{background:var(--hit);color:inherit;border-radius:3px}
+@media(max-width:480px){.seg{grid-template-columns:1fr;gap:6px}.seg time{width:96px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round"><path d="M4 10v4M8 6v12M12 3v18M16 7v10M20 10v4"/></svg></div>
+  <div><h1>Transcriptor Pro</h1><p>Audio y video a texto, con la hora de cada frase</p></div>
+  <button id="theme" aria-label="Cambiar entre tema claro y oscuro" title="Cambiar tema">
+    <svg class="moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    <svg class="sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+  </button>
+</header>
+<main>
+  <section class="side">
+    <div class="card">
+      <label class="drop" id="drop" for="file">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4m0 0L7 9m5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+        <strong>Suelta tu archivo aquí</strong><small>o haz clic para elegirlo. MP3, WAV, M4A, MP4, MKV, MOV, WEBM</small>
+      </label>
+      <input id="file" type="file" accept="audio/*,video/*">
+      <div class="fname" id="fname"></div>
+      <div id="player"></div>
+      <label class="f" for="model">Calidad</label>
+      <select id="model">
+        <option value="whisper-large-v3-turbo" selected>Rápida (large-v3-turbo)</option>
+        <option value="whisper-large-v3">Máxima precisión (large-v3)</option>
+      </select>
+      <label class="f" for="lang">Idioma del audio</label>
+      <select id="lang">
+        <option value="">Detectar automáticamente</option><option value="es">Español</option><option value="en">Inglés</option>
+        <option value="pt">Portugués</option><option value="fr">Francés</option><option value="de">Alemán</option>
+        <option value="it">Italiano</option>
+      </select>
+      <button class="btn primary" id="go" disabled>Transcribir</button>
+    </div>
+    <div class="card status" id="status">
+      <div class="stage"><span id="stage">En cola</span><b id="pct">0%</b></div>
+      <div class="bar"><i id="fill"></i></div>
+      <div class="err" id="err"></div>
+    </div>
+  </section>
+  <section class="card">
+    <div class="tools">
+      <input type="search" id="q" placeholder="Buscar en la transcripción" aria-label="Buscar en la transcripción">
+      <button class="btn ghost off" id="copy">Copiar</button>
+      <a class="btn ghost off" data-f="txt">TXT</a><a class="btn ghost off" data-f="srt">SRT</a>
+      <a class="btn ghost off" data-f="vtt">VTT</a><a class="btn ghost off" data-f="json">JSON</a>
+    </div>
+    <div class="meta" id="meta"></div>
+    <div id="list"><div class="empty"><h2>Aún no hay transcripción</h2><p>Sube un audio o video y pulsa Transcribir. Cada frase aparecerá con su hora.</p></div></div>
+  </section>
+</main>
+<script>
+const $=s=>document.querySelector(s);
+const pad=n=>String(n).padStart(2,'0');
+const clock=t=>`${pad(Math.floor(t/3600))}:${pad(Math.floor(t%3600/60))}:${pad(Math.floor(t%60))}`;
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const chips=(l,du)=>`<span class="chip">Idioma <b>${l.toUpperCase()}</b></span><span class="chip">Duración <b>${clock(du)}</b></span><span class="chip"><b>${segs.length}</b> frases</span>`;
+$('#theme').onclick=()=>{const r=document.documentElement,t=r.dataset.theme==='dark'?'light':'dark';r.dataset.theme=t;try{localStorage.setItem('theme',t)}catch(e){}};
+let file,jobId,timer,segs=[],media=null,url=null;
+
+function setFile(f){
+  if(!f)return; file=f; $('#fname').textContent=f.name; $('#go').disabled=false;
+  if(url)URL.revokeObjectURL(url); url=URL.createObjectURL(f);
+  const tag=f.type.startsWith('video')?'video':'audio';
+  $('#player').innerHTML=`<${tag} controls src="${url}"></${tag}>`;
+  media=$('#player').firstElementChild; media.addEventListener('timeupdate',highlight);
+}
+$('#file').onchange=e=>setFile(e.target.files[0]);
+const drop=$('#drop');
+['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('over')}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('over')}));
+drop.addEventListener('drop',e=>setFile(e.dataTransfer.files[0]));
+
+function setStatus(p,stage,err){
+  $('#status').classList.add('on'); $('#fill').style.width=p+'%'; $('#pct').textContent=Math.round(p)+'%'; $('#stage').textContent=stage;
+  const e=$('#err'); e.style.display=err?'block':'none'; e.textContent=err||'';
+}
+function reset(){ segs=[]; $('#list').innerHTML=''; $('#meta').textContent=''; toggleExport(false); }
+function toggleExport(on){
+  document.querySelectorAll('[data-f]').forEach(a=>{a.classList.toggle('off',!on); if(on)a.href=`/api/jobs/${jobId}/export?format=${a.dataset.f}`;});
+  $('#copy').classList.toggle('off',!on);
+}
+$('#go').onclick=async()=>{
+  reset(); $('#go').disabled=true; setStatus(0,'Subiendo archivo');
+  const fd=new FormData(); fd.append('file',file); fd.append('model',$('#model').value); fd.append('language',$('#lang').value);
+  try{
+    const r=await fetch('/api/transcribe',{method:'POST',body:fd});
+    if(!r.ok)throw new Error((await r.json()).detail||'Error al subir el archivo.');
+    jobId=(await r.json()).job_id; timer=setInterval(poll,900);
+  }catch(e){setStatus(0,'Error',e.message);$('#go').disabled=false;}
+};
+async function poll(){
+  try{
+    const d=await (await fetch(`/api/jobs/${jobId}?since=${segs.length}`)).json();
+    d.segments.forEach(addSeg);
+    setStatus(d.progress,d.stage,d.error);
+    if(d.language)$('#meta').innerHTML=chips(d.language,d.duration);
+    if(d.status!=='processing'){clearInterval(timer);$('#go').disabled=false;if(d.status==='done')toggleExport(true);}
+  }catch(e){clearInterval(timer);setStatus(0,'Error',e.message);$('#go').disabled=false;}
+}
+function addSeg(s){
+  const i=segs.push(s)-1, el=document.createElement('div');
+  el.className='seg'; el.dataset.i=i; el.innerHTML=`<time>${clock(s.start)}</time><p>${esc(s.text)}</p>`;
+  el.onclick=()=>{if(media){media.currentTime=s.start;media.play();}};
+  $('#list').appendChild(el);
+}
+function highlight(){
+  const t=media.currentTime; let idx=-1;
+  for(let i=0;i<segs.length;i++){if(t>=segs[i].start&&t<segs[i].end){idx=i;break;}}
+  document.querySelectorAll('.seg.on').forEach(e=>e.classList.remove('on'));
+  const el=document.querySelector(`.seg[data-i="${idx}"]`);
+  if(el){el.classList.add('on');el.scrollIntoView({block:'nearest',behavior:'smooth'});}
+}
+$('#q').oninput=e=>{
+  const q=e.target.value.trim().toLowerCase();
+  document.querySelectorAll('.seg').forEach(el=>{
+    const s=segs[el.dataset.i], hit=!q||s.text.toLowerCase().includes(q);
+    el.classList.toggle('hide',!hit);
+    el.querySelector('p').innerHTML=q&&hit?esc(s.text).replace(new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'),m=>`<mark>${m}</mark>`):esc(s.text);
+  });
+};
+$('#copy').onclick=async()=>{
+  await navigator.clipboard.writeText(segs.map(s=>`[${clock(s.start)}] ${s.text}`).join('\n'));
+  $('#copy').textContent='Copiado'; setTimeout(()=>$('#copy').textContent='Copiar',1500);
+};
+</script>
+</body>
+</html>
